@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerTrack | Job Monitoring Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-info h3 {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-info p {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Main Content Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar / Setup */
+        .setup-panel {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .input-with-btn {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 0.625rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .tag {
+            background: var(--bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .tag i {
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .tag i:hover {
+            color: #ef4444;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+
+        /* Monitoring Toggle */
+        .monitor-status {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Job Feed */
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .job-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .job-card:hover {
+            transform: scale(1.01);
+            box-shadow: var(--shadow-lg);
+            border-left-color: var(--primary);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .job-info {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+        }
+
+        .source-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .job-details h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .job-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Notifications */
+        .notification-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--text-main);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-briefcase"></i>
+                CareerTrack
+            </div>
+            <div id="notification-status">
+                <button class="btn btn-outline" onclick="requestNotificationPermission()">
+                    <i class="fas fa-bell"></i> Enable Notifications
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Jobs Tracked</h3>
+                    <p id="stat-total">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>New Alerts Today</h3>
+                    <p id="stat-today">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fff7ed; color: #f97316;">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Companies Monitored</h3>
+                    <p id="stat-companies">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Setup Panel -->
+            <aside class="setup-panel">
+                <h2 class="section-title"><i class="fas fa-cog"></i> Monitoring Setup</h2>
+                
+                <div class="form-group">
+                    <label>Target Companies</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="company-input" placeholder="e.g. Google, Stripe">
+                        <button class="btn btn-primary" onclick="addItem('company')"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="company-tags" class="tag-container"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Job Keywords / Roles</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="keyword-input" placeholder="e.g. Frontend Engineer">
+                        <button class="btn btn-primary" onclick="addItem('keyword')"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="keyword-tags" class="tag-container"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Job Board Sources</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked onchange="updateSource('LinkedIn', this.checked)">
+                            <span>LinkedIn</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked onchange="updateSource('Naukri', this.checked)">
+                            <span>Naukri</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked onchange="updateSource('Foundit', this.checked)">
+                            <span>Foundit</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked onchange="updateSource('Career Pages', this.checked)">
+                            <span>Company Career Pages</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="monitor-status">
+                    <div>
+                        <p style="font-weight: 600;">Active Monitoring</p>
+                        <p id="status-text" style="font-size: 0.75rem; color: var(--text-muted);">Status: OFF</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="monitor-toggle" onchange="toggleMonitoring()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </aside>
+
+            <!-- Job Feed -->
+            <main class="feed-container">
+                <div class="feed-header">
+                    <h2 class="section-title"><i class="fas fa-rss"></i> Live Job Alerts</h2>
+                    <button class="btn btn-outline btn-sm" onclick="clearAlerts()">Clear All</button>
+                </div>
+                
+                <div id="job-feed">
+                    <!-- Jobs will be injected here -->
+                    <div class="empty-state">
+                        <i class="fas fa-radar"></i>
+                        <p>No active alerts. Configure your preferences and turn on monitoring to start tracking jobs.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let state = {
+            companies: ['Google', 'Microsoft', 'Amazon', 'Netflix'],
+            keywords: ['Software Engineer', 'Product Manager', 'Data Scientist'],
+            sources: ['LinkedIn', 'Naukri', 'Foundit', 'Career Pages'],
+            isMonitoring: false,
+            alerts: [],
+            stats: {
+                total: 0,
+                today: 0
+            }
+        };
+
+        // Initialize from LocalStorage
+        function init() {
+            const savedState = localStorage.getItem('careerTrackState');
+            if (savedState) {
+                const parsed = JSON.parse(savedState);
+                state = { ...state, ...parsed, isMonitoring: false }; // Always start with monitoring OFF
+            }
+            renderUI();
+        }
+
+        function saveState() {
+            localStorage.setItem('careerTrackState', JSON.stringify({
+                companies: state.companies,
+                keywords: state.keywords,
+                sources: state.sources,
+                alerts: state.alerts,
+                stats: state.stats
+            }));
+        }
+
+        // UI Rendering
+        function renderUI() {
+            renderTags('company', state.companies);
+            renderTags('keyword', state.keywords);
+            renderAlerts();
+            updateStats();
+            
+            document.getElementById('monitor-toggle').checked = state.isMonitoring;
+            document.getElementById('status-text').innerText = `Status: ${state.isMonitoring ? 'ON' : 'OFF'}`;
+            document.getElementById('status-text').style.color = state.isMonitoring ? 'var(--success)' : 'var(--text-muted)';
+        }
+
+        function renderTags(type, items) {
+            const container = document.getElementById(`${type}-tags`);
+            container.innerHTML = items.map((item, index) => `
+                <div class="tag">
+                    ${item}
+                    <i class="fas fa-times" onclick="removeItem('${type}', ${index})"></i>
+                </div>
+            `).join('');
+        }
+
+        function renderAlerts() {
+            const feed = document.getElementById('job-feed');
+            if (state.alerts.length === 0) {
+                feed.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-satellite-dish"></i>
+                        <p>No active alerts. Configure your preferences and turn on monitoring to start tracking jobs.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            feed.innerHTML = state.alerts.map(job => `
+                <div class="job-card">
+                    <div class="job-info">
+                        <div class="source-icon">
+                            <i class="${getSourceIcon(job.source)}"></i>
+                        </div>
+                        <div class="job-details">
+                            <h4>${job.title}</h4>
+                            <div class="job-meta">
+                                <span><i class="fas fa-building"></i> ${job.company}</span>
+                                <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
+                                <span><i class="fas fa-clock"></i> ${job.time}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="job-actions">
+                        <button class="btn btn-primary" onclick="window.open('#', '_blank')">View Job</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getSourceIcon(source) {
+            switch(source) {
+                case 'LinkedIn': return 'fab fa-linkedin';
+                case 'Naukri': return 'fas fa-n';
+                case 'Foundit': return 'fas fa-f';
+                default: return 'fas fa-globe';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = state.stats.total;
+            document.getElementById('stat-today').innerText = state.stats.today;
+            document.getElementById('stat-companies').innerText = state.companies.length;
+        }
+
+        // Actions
+        function addItem(type) {
+            const input = document.getElementById(`${type}-input`);
+            const value = input.value.trim();
+            if (value) {
+                state[`${type}s`].push(value);
+                input.value = '';
+                saveState();
+                renderUI();
+            }
+        }
+
+        function removeItem(type, index) {
+            state[`${type}s`].splice(index, 1);
+            saveState();
+            renderUI();
+        }
+
+        function updateSource(source, isChecked) {
+            if (isChecked) {
+                if (!state.sources.includes(source)) state.sources.push(source);
+            } else {
+                state.sources = state.sources.filter(s => s !== source);
+            }
+            saveState();
+        }
+
+        function clearAlerts() {
+            state.alerts = [];
+            state.stats.today = 0;
+            saveState();
+            renderUI();
+        }
+
+        // Monitoring Logic
+        let monitorInterval;
+
+        function toggleMonitoring() {
+            state.isMonitoring = document.getElementById('monitor-toggle').checked;
+            
+            if (state.isMonitoring) {
+                showToast("Monitoring started. Looking for matches...");
+                monitorInterval = setInterval(simulateJobSearch, 5000);
+            } else {
+                showToast("Monitoring paused.");
+                clearInterval(monitorInterval);
+            }
+            renderUI();
+        }
+
+        function simulateJobSearch() {
+            if (state.companies.length === 0 || state.keywords.length === 0 || state.sources.length === 0) return;
+
+            // 30% chance to find a job every tick
+            if (Math.random() > 0.7) {
+                const company = state.companies[Math.floor(Math.random() * state.companies.length)];
+                const keyword = state.keywords[Math.floor(Math.random() * state.keywords.length)];
+                const source = state.sources[Math.floor(Math.random() * state.sources.length)];
+                const locations = ['Remote', 'New York, NY', 'San Francisco, CA', 'London, UK', 'Bangalore, IN', 'Singapore'];
+                
+                const newJob = {
+                    id: Date.now(),
+                    title: keyword,
+                    company: company,
+                    source: source,
+                    location: locations[Math.floor(Math.random() * locations.length)],
+                    time: 'Just now'
+                };
+
+                state.alerts.unshift(newJob);
+                if (state.alerts.length > 50) state.alerts.pop(); // Keep last 50
+                
+                state.stats.total++;
+                state.stats.today++;
+                
+                saveState();
+                renderUI();
+                sendNotification(newJob);
+            }
+        }
+
+        // Notifications
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                alert("This browser does not support desktop notification");
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    document.getElementById('notification-status').innerHTML = `
+                        <span style="color: var(--success); font-size: 0.875rem; font-weight: 500;">
+                            <i class="fas fa-check-circle"></i> Notifications Enabled
+                        </span>
+                    `;
+                }
+            });
+        }
+
+        function sendNotification(job) {
+            if (Notification.permission === "granted") {
+                new Notification(`New Job Match: ${job.title}`, {
+                    body: `${job.company} is hiring on ${job.source}!`,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/3850/3850285.png'
+                });
+            } else {
+                showToast(`New Match: ${job.title} at ${job.company}`);
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'notification-toast';
+            toast.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
